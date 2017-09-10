@@ -41,7 +41,7 @@ public class Transformer {
             Map metaDataMap = (Map) clz.getDeclaredField("metaDataMap").get(message);
             for (Field field : o.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
-                if (field.getName().startsWith("this$") || field.getName().startsWith("$")) {
+                if (field.getName().contains("$")) {
                     continue;
                 }
                 Field f = message.getClass().getDeclaredField(field.getName());
@@ -55,7 +55,24 @@ public class Transformer {
                     TBase messageInner = fromJava(innerObject, ((StructMetaData) fieldMeta.valueMetaData).structClass);
                     f.set(message, messageInner);
                 } else {
-                    f.set(message, field.get(o));
+                    switch (fieldMeta.valueMetaData.type) {
+                        case 6:
+                            Object so = field.get(o);
+                            short v = 0;
+                            if (so instanceof Number) {
+                                v = ((Integer) so).shortValue();
+                            }
+                            f.set(message, v);
+                            break;
+                            /*
+                            case 13:
+                                System.out.println("aaa");
+                                break;
+                            */
+                        default:
+                            f.set(message, field.get(o));
+                            break;
+                    }
                 }
             }
 

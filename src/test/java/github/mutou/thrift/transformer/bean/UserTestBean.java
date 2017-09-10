@@ -1,5 +1,6 @@
-package github.mutou.thrift.transformer;
+package github.mutou.thrift.transformer.bean;
 
+import github.mutou.thrift.transformer.bean.OTestBean;
 import lombok.Data;
 
 @Data
