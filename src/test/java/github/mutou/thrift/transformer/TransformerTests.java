@@ -19,7 +19,10 @@ public class TransformerTests {
                 public int t = 10;
             };
         }, Request.class);
-        System.out.println(r);
+        assert r != null;
+        assert r.name == "michael";
+        assert r.o.name == "savior";
+        assert r.o.t == 10;
     }
 
     @Test
@@ -34,7 +37,9 @@ public class TransformerTests {
         }, Request.class);
 
         UserTestBean u = toJava(r, UserTestBean.class);
-        System.out.println(u);
+        assert u.name == "michael";
+        assert u.o.name == "savior";
+        assert u.o.t == 10;
     }
 
 
