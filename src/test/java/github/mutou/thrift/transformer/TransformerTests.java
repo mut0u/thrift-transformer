@@ -4,6 +4,7 @@ import github.mutou.thrift.demo.BaseStruct;
 import github.mutou.thrift.demo.ContainerStruct;
 import github.mutou.thrift.demo.Request;
 import github.mutou.thrift.transformer.bean.BaseBean;
+import github.mutou.thrift.transformer.bean.ContainerBean;
 import github.mutou.thrift.transformer.bean.UserTestBean;
 import org.junit.Test;
 
@@ -85,4 +86,23 @@ public class TransformerTests {
         assert r != null && r.m != null && !r.m.isEmpty() && r.m.get("k2") == "v2";
     }
 
+
+    @Test
+    public void transferContainerTypeTest2() throws TransformException {
+        Map<String, String> mm = new HashMap<>();
+        mm.put("k1", "v1");
+        mm.put("k2", "v2");
+        ContainerStruct r = fromJava(new Object() {
+            public List<String> sList = Arrays.asList("aa", "bb");
+            public List<BaseBean> baseList = Arrays.asList(
+                    new BaseBean().set("b1"),
+                    new BaseBean().set("b2"));
+            public Map<String, String> m = mm;
+
+        }, ContainerStruct.class);
+
+        ContainerBean r1 = toJava(r, ContainerBean.class);
+        assert r1.sList != null && !r1.sList.isEmpty() && r1.sList.get(0) == "aa";
+        assert r1 != null && r1.m != null && !r1.m.isEmpty() && r1.m.get("k2") == "v2";
+    }
 }
