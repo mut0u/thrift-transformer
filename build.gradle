@@ -3,6 +3,7 @@ buildscript {
 
     }
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             url "https://plugins.gradle.org/m2/"
@@ -16,7 +17,14 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'idea'
+apply plugin: "org.jruyi.thrift"
 
+jar {
+    baseName = 'thrift-transformer'
+}
+
+
+group = 'com.github.mut0u'
 
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
@@ -25,7 +33,7 @@ repositories {
     mavenCentral()
 }
 
-apply plugin: "org.jruyi.thrift"
+
 
 
 

@@ -106,6 +106,8 @@ public class Transformer {
                 Field oField = clz.getDeclaredField(field.getName());
                 if (oField == null) {
                     continue;
+                } else {
+                    oField.setAccessible(true);
                 }
 
                 TFieldIdEnum fieldEntity = getFieldByName(message.getClass().getClasses()[0], field.getName());
@@ -117,21 +119,26 @@ public class Transformer {
                     Object objectInner = toJava((F) field.get(message), oField.getType());
                     oField.set(o, objectInner);
                 } else {
-                    oField.set(o, field.get(message));
+
+                     if(field.get(message) instanceof org.apache.thrift.TEnum) {
+                         Integer tempObject =  ((org.apache.thrift.TEnum) field.get(message)).getValue();
+                         if(oField.getType() == int.class){
+                             oField.set(o, tempObject);
+                         } else if (oField.getType() == String.class) {
+                             oField.set(o, tempObject.toString());
+                         }
+
+                     } else {
+                         oField.set(o, field.get(message));
+                     }
                 }
             }
 
 
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            throw new TransformException("transfer exception", e);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            throw new TransformException("transfer exception", e);
-        } catch (NoSuchFieldException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
             throw new TransformException("transfer exception", e);
         }
-        return o;
+      return o;
     }
 }
