@@ -32,19 +32,41 @@ public class Transformer {
         }
     }
 
+    private static String setMethodName(String fileName){
+        if(fileName ==null){
+            return null;
+        } else if (fileName.length() ==1){
+            return "set" + Character.toUpperCase(fileName.charAt(0));
+         } else {
+            return "set" + Character.toUpperCase(fileName.charAt(0)) + fileName.substring(1);
+        }
+
+    }
 
     public static <T extends TBase> T fromJava(Object o, Class<T> clz) throws TransformException {
 
         T message = null;
         try {
             message = clz.newInstance();
-            Map metaDataMap = (Map) clz.getDeclaredField("metaDataMap").get(message);
+            Map metaDataMap;
+            try {
+                metaDataMap = (Map) clz.getDeclaredField("metaDataMap").get(message);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                throw new TransformException("transfer exception", e);
+            }
             for (Field field : o.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
                 if (field.getName().contains("$")) {
                     continue;
                 }
-                Field f = message.getClass().getDeclaredField(field.getName());
+                Field f;
+                try {
+                    f = message.getClass().getDeclaredField(field.getName());
+                } catch (NoSuchFieldException e) {
+                    System.out.println("can not find the field");
+                    continue;
+                }
                 TFieldIdEnum fieldEntity = getFieldByName(clz.getClasses()[0], field.getName());
                 FieldMetaData fieldMeta = (FieldMetaData) metaDataMap.get(fieldEntity);
                 if (fieldMeta == null) {
@@ -64,11 +86,26 @@ public class Transformer {
                             }
                             f.set(message, v);
                             break;
-                            /*
-                            case 13:
-                                System.out.println("aaa");
+                        case 10:
+                            try {
+                                Method setMethod = message.getClass().getDeclaredMethod(setMethodName(fieldMeta.fieldName), long.class);
+                              if (setMethod != null) {
+                                setMethod.invoke(message, field.get(o));
+                              }
+                            } catch (NoSuchMethodException |InvocationTargetException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                            case 16:
+                                try {
+                                  Method tmpMethod = f.getType().getDeclaredMethod("findByValue", int.class);
+                                    f.set(message , tmpMethod.invoke(f.getType(), field.get(o)));
+                                } catch (NoSuchMethodException | InvocationTargetException e) {
+                                    e.printStackTrace();
+                                }
+
                                 break;
-                            */
+
                         default:
                             f.set(message, field.get(o));
                             break;
@@ -81,9 +118,6 @@ public class Transformer {
             e.printStackTrace();
             throw new TransformException("transfer exception", e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            throw new TransformException("transfer exception", e);
-        } catch (NoSuchFieldException e) {
             e.printStackTrace();
             throw new TransformException("transfer exception", e);
         }
