@@ -8,3 +8,9 @@
 ```
 gradle compileThrift
 ```
+
+
+```
+gradle install
+```
+
