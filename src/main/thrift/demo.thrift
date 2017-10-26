@@ -22,6 +22,16 @@ struct Request{
   2:O o;
 }
 
+struct SetStruct{
+  1:i16 i1;
+  2:i32 i2;
+  3:i64 i3;
+  4:double i4;
+  5:string i5;
+  6:byte i6;
+}
+
+
 
 struct BaseStruct{
   1:bool bool1;

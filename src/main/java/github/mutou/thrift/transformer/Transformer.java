@@ -25,9 +25,7 @@ public class Transformer {
         }
         try {
             return (TFieldIdEnum) method.invoke(fieldsClass, name);
-        } catch (IllegalAccessException e) {
-            throw new TransformException("can not call the method named : findByName", e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new TransformException("can not call the method named : findByName", e);
         }
     }
@@ -86,6 +84,7 @@ public class Transformer {
                             }
                             f.set(message, v);
                             break;
+                            // todo case 8 , 3, 4
                         case 10:
                             try {
                                 Method setMethod = message.getClass().getDeclaredMethod(setMethodName(fieldMeta.fieldName), long.class);
